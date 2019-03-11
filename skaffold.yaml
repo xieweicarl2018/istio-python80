@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/xieweicarl2018/istio-python80:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/xieweicarl2018/istio-python80:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: istio-python80
+        chartPath: charts/istio-python80
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/xieweicarl2018/istio-python80'
+          image.tag: '{{.DIGEST_HEX}}'
